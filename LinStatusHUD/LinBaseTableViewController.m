@@ -39,6 +39,8 @@
 -(void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+    
+//    [self.hud hide];
    
     NSLog(@"%@",[LinStatusHUD statusHud]);
     NSLog(@"%@",self.hud);
@@ -141,7 +143,9 @@ static bool isSelct = YES;
 //在最后的时候,赢藏了
 - (void)dealloc
 {
-    [self.hud hide];
+    
+    NSLog(@"我释放");
+//    [self.hud hide];
 }
 
 

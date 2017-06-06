@@ -44,12 +44,31 @@ static  LinShowFrameType showType = statusBarType;
 - (void)setupText:(NSString *)text image:(UIImage *)image withType:(LinShowFrameType)type
 {
     showType = type;
-    CGRect windowF = (type == navigationBarType ? [self navigationBarFame] : [self statusBarFrame]);
+    CGRect windowF = CGRectZero;
+    
+    switch (type) {
+            
+        case navigationBarType:
+            
+            windowF = [self navigationBarFame];
+            break;
+            
+        case statusBarType:
+            
+            windowF = [self statusBarFrame];
+            break;
+            
+        case coverNavigationBarType:
+            
+            windowF = [self coverNavigitionBarFrame];
+            break;
+    }
+    
     // 创建
     window_ = [[UIWindow alloc] init];
     window_.frame = windowF;
     window_.windowLevel = UIWindowLevelAlert;
-    window_.hidden = (type == statusBarType ? NO : YES);
+    window_.hidden = NO;
     window_.backgroundColor = self.hudColor;
     
     // 添加按钮
@@ -108,6 +127,14 @@ static  LinShowFrameType showType = statusBarType;
     return statusBarFrame;
 }
 
+
+-(CGRect)coverNavigitionBarFrame
+{
+    CGRect frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 64);
+    
+    return frame;
+}
+
  -(void)navigationShowStyleWithWindowFrame:(CGRect)windowF
 {
     window_.hidden = NO;
@@ -130,6 +157,18 @@ static  LinShowFrameType showType = statusBarType;
         window_.frame = windowF;
     }];
 }
+
+-(void)coverNavigationBarShowStyleWithWindowFrame:(CGRect)windowF
+{
+    CGRect beginWindowF = windowF;
+    beginWindowF.origin.y = - beginWindowF.size.height;
+    window_.frame = beginWindowF;
+    [UIView animateWithDuration:AnimationDuration animations:^{
+        window_.frame = windowF;
+    }];
+}
+
+
 
  -(void)navigationBarDismissStyle
 {
@@ -162,6 +201,22 @@ static  LinShowFrameType showType = statusBarType;
         if (timer_ == nil) window_ = nil;
     }];
 
+}
+
+-(void)coverNavigationBarDissmissStyle
+{
+    // 停止定时器
+    [timer_ invalidate];
+    timer_ = nil;
+    // 隐藏
+    [UIView animateWithDuration:AnimationDuration animations:^{
+        CGRect beginWindowF = window_.frame;
+        beginWindowF.origin.y = - beginWindowF.size.height;
+        window_.frame = beginWindowF;
+    } completion:^(BOOL finished) {
+        // 如果定时器是nil, 说明这个hide动画期间, 没有创建任何新的窗口
+        if (timer_ == nil) window_ = nil;
+    }];
 }
 
 
@@ -254,17 +309,37 @@ static  LinShowFrameType showType = statusBarType;
 /**
  *  隐藏指示器
  */
- - (void)hide
+- (void)hide
 {
-   
     if (window_ == nil) {return;};
     if (window_.hidden == YES) {return;};
+    
+    [timer_ invalidate];
+    timer_ = nil;
+       
     if ([self.delegate respondsToSelector:@selector(linStatusHUDWillHideWithHud: withHudHeight:)])
     {
         [self.delegate linStatusHUDWillHideWithHud:self withHudHeight:window_.frame.size.height];
     }
+  
+    switch (showType) {
+            
+        case navigationBarType:
+            
+            [self navigationBarDismissStyle];
+            break;
+            
+        case statusBarType:
+            
+            [self statusBarDismissStyle];
+            break;
+            
+        case coverNavigationBarType:
+            
+            [self coverNavigationBarDissmissStyle];
+            break;
+    }
     
-    showType == navigationBarType ? [self navigationBarDismissStyle] : [self statusBarDismissStyle];
     
     if ([self.delegate respondsToSelector:@selector(linStatusHUDDidHideWithHud:)])
     {
@@ -280,7 +355,22 @@ static  LinShowFrameType showType = statusBarType;
         [self.delegate linStatusHUDWillShowWithHud:self withHudHeight:window_.frame.size.height];
     }
     
-   showType == navigationBarType ? [self navigationShowStyleWithWindowFrame:windowF] : [self statusBarShowStyleWithWindowFrame:windowF];
+    switch (showType) {
+            
+        case navigationBarType:
+            
+            [self navigationShowStyleWithWindowFrame:windowF];
+            break;
+            
+        case statusBarType:
+            
+            [self statusBarShowStyleWithWindowFrame:windowF];
+            break;
+            
+        case coverNavigationBarType:
+            [self coverNavigationBarShowStyleWithWindowFrame:windowF];
+            break;
+    }
     
     if ([self.delegate respondsToSelector:@selector(linStatusHUDDidShowWithHud:)])
     {

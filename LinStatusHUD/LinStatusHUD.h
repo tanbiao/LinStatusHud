@@ -10,9 +10,14 @@
 
 typedef enum : NSUInteger
 {
+    /*在导航栏下*/
     navigationBarType = 1 ,
     
+    /*覆盖状态栏*/
     statusBarType = 2,
+    
+    /*覆盖导航栏*/
+    coverNavigationBarType = 3,
     
 } LinShowFrameType;
 

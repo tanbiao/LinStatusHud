@@ -28,6 +28,7 @@
 
 
 - (IBAction)success {
+       
     
 ////    [LinStatusHUD shareInstance].delegate = self;
 //    self.hud = [LinStatusHUD statusHud];
@@ -44,9 +45,12 @@
 
 - (IBAction)eror {
     
+    self.hud = [LinStatusHUD statusHud];
+    self.hud.hudColor = [UIColor redColor];
+    [self.hud showWranning:@"你拨打的电话已关机" withType:coverNavigationBarType];
 //     [LinStatusHUD shareInstance].hudColor = [UIColor yellowColor];
 //    [[LinStatusHUD statusHud]showError:@"登录失败!" withType:statusBarType];
-    [[LinStatusHUD statusHud] showError:@"登录失败" withType:statusBarType];
+//    [[LinStatusHUD statusHud] showError:@"登录失败" withType:statusBarType];
 //    [[LinStatusHUD statusHud] showWranning:@"出现警告了" withType:navigationBarType];
   
 }
